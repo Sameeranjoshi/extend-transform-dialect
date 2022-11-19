@@ -1,3 +1,4 @@
+// XFAIL:*
 // RUN: mlir-opt %s -test-transform-dialect-interpreter -split-input-file -verify-diagnostics | FileCheck %s
 
 // -----
