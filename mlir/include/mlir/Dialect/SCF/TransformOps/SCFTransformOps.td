@@ -42,6 +42,37 @@ def GetParentForOp : Op<Transform_Dialect, "loop.get_parent_for",
     "$target attr-dict `:` functional-type(operands, results)";
 }
 
+def GetChildForOp : Op<Transform_Dialect, "loop.get_child_for", 
+  [ NavigationTransformOpTrait, MemoryEffectsOpInterface, 
+    DeclareOpInterfaceMethods<TransformOpInterface>]> {
+  
+  let summary = "This operation gets the child for loop and works only on scf dialect.";
+  let description = [{
+    # This is markdown definition of the operation of the dialect.
+    The aim is just to test and play with writing a simple dialect in the transform dialect 
+    targetting the SCF dialect specifically mimicing the `loop.get_parent_for` and trying to get the 
+    opposite version of it with getting the handle to child for loop.
+    This activity helps to understand the end-to-end flow of adding a new operation in Transform dialect.
+  }];
+  
+  // This wants me to give 2 things
+  // input argument and attribute
+  // 1. decide names.
+  // 2. decide their types
+
+  let arguments = (ins 
+                  TransformTypeInterface:$target // target is the name, 
+                  // No argument for this Op.
+                  );
+  let results = (outs TransformTypeInterface:$child); // Note this returns the child loop
+  // Did not understand how to write but move on for now.
+  let assemblyFormat =
+    "$target attr-dict `:` functional-type(operands, results)";
+  // BOol vars
+
+  // Custom things
+}
+
 def LoopOutlineOp : Op<Transform_Dialect, "loop.outline",
     [FunctionalStyleTransformOpTrait, MemoryEffectsOpInterface,
      DeclareOpInterfaceMethods<TransformOpInterface>]> {

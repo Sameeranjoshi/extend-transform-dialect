@@ -12,7 +12,7 @@
 
 #ifndef MLIR_IR_OPERATION_H
 #define MLIR_IR_OPERATION_H
-
+#include <iostream>
 #include "mlir/IR/Block.h"
 #include "mlir/IR/BuiltinAttributes.h"
 #include "mlir/IR/Diagnostics.h"
@@ -207,6 +207,82 @@ public:
   /// or nullptr if this is a top-level operation.
   Operation *getParentOp() { return block ? block->getParentOp() : nullptr; }
 
+
+  void printOperation(Operation *op) {
+    // Print the operation itself and some of its properties
+    printIndent() << "visiting op: '" << op->getName() << "' with "
+                  << op->getNumOperands() << " operands and "
+                  << op->getNumResults() << " results\n";
+    // Print the operation attributes
+    if (!op->getAttrs().empty()) {
+      printIndent() << op->getAttrs().size() << " attributes:\n";
+      for (NamedAttribute attr : op->getAttrs())
+        printIndent() << " - '" << attr.getName().getValue() << "' : '"
+                      << attr.getValue() << "'\n";
+    }
+
+    // Recurse into each of the regions attached to the operation.
+    printIndent() << " " << op->getNumRegions() << " nested regions:\n";
+    auto indent = pushIndent();
+    for (Region &region : op->getRegions())
+      printRegion(region);
+  }
+
+  void printRegion(Region &region) {
+    // A region does not hold anything by itself other than a list of blocks.
+    printIndent() << "Region with " << region.getBlocks().size()
+                  << " blocks:\n";
+    auto indent = pushIndent();
+    for (Block &block : region.getBlocks())
+      printBlock(block);
+  }
+
+  void printBlock(Block &block) {
+    // Print the block intrinsics properties (basically: argument list)
+    printIndent()
+        << "Block with " << block.getNumArguments() << " arguments, "
+        << block.getNumSuccessors()
+        << " successors, and "
+        // Note, this `.size()` is traversing a linked-list and is O(n).
+        << block.getOperations().size() << " operations\n";
+
+    // Block main role is to hold a list of Operations: let's recurse.
+    auto indent = pushIndent();
+    for (Operation &op : block.getOperations())
+      printOperation(&op);
+  }
+
+  /// Manages the indentation as we traverse the IR nesting.
+  int indent;
+  struct IdentRAII {
+    int &indent;
+    IdentRAII(int &indent) : indent(indent) {}
+    ~IdentRAII() { --indent; }
+  };
+  void resetIndent() { indent = 0; }
+  IdentRAII pushIndent() { return IdentRAII(++indent); }
+
+  llvm::raw_ostream &printIndent() {
+    for (int i = 0; i < indent; ++i)
+      llvm::outs() << "  ";
+    return llvm::outs();
+  }
+
+  // Returns the closest surrounding child operation that contains this operation
+  // or nullptr if this is a lowest-level operation.
+  Operation *getChildOp() {
+    if (block){
+      //block->front().print(&llvm::outs);
+      //return &block->front();
+      this->getRegion(0).front().print(llvm::outs());
+      //block->print(llvm::outs());
+      //printBlock(*block);
+      return &this->getRegion(0).front().front();
+    } else{
+      return nullptr;
+    }
+  }
+
   /// Return the closest surrounding parent operation that is of type 'OpTy'.
   template <typename OpTy>
   OpTy getParentOfType() {
@@ -214,6 +290,17 @@ public:
     while ((op = op->getParentOp()))
       if (auto parentOp = dyn_cast<OpTy>(op))
         return parentOp;
+    return OpTy();
+  }
+
+ /// Return the closest successor child operation that is of type 'OpTy'.
+  template <typename OpTy>
+  OpTy getChildOfType() {
+    auto *op = this;
+    while ((op = op->getChildOp())){
+      if (auto childOp = dyn_cast<OpTy>(op))
+        return childOp;
+    }
     return OpTy();
   }
 
