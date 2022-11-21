@@ -264,6 +264,21 @@ transform::LoopUnrollOp::applyToOne(Operation *op,
 }
 
 //===----------------------------------------------------------------------===//
+// LoopInterchangeOp
+//===----------------------------------------------------------------------===//
+/*DiagnosedSilenceableFailure
+transform::LoopInterchangeOp::apply(scf::ForOp loop_one_handle, scf::ForOp loop_two_handle,
+                                    SmallVector<Operation *> &results,
+                                    transform::TransformState &state) {
+  if (failed(loopUnrollByFactor(target, getFactor()))) {
+    Diagnostic diag(target->getLoc(), DiagnosticSeverity::Note);
+    diag << "op failed to unroll";
+    return DiagnosedSilenceableFailure::silenceableFailure(std::move(diag));
+  }
+  //return DiagnosedSilenceableFailure(success());
+}*/
+
+//===----------------------------------------------------------------------===//
 // Transform op registration
 //===----------------------------------------------------------------------===//
 

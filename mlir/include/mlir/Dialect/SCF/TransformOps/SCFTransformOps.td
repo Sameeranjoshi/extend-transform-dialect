@@ -219,5 +219,66 @@ def LoopUnrollOp : Op<Transform_Dialect, "loop.unroll",
         ::mlir::transform::TransformState &state);
   }];
 }
+/*
+    [DeclareOpInterfaceMethods<MemoryEffectsOpInterface>,
+     DeclareOpInterfaceMethods<TransformOpInterface>]> {
 
+       [FunctionalStyleTransformOpTrait, MemoryEffectsOpInterface,
+     TransformOpInterface, TransformEachOpTrait]> {
+*/
+
+/*def LoopInterchangeOp : Op<Transform_Dialect, "loop.interchange",
+    [ NavigationTransformOpTrait, MemoryEffectsOpInterface, 
+    DeclareOpInterfaceMethods<TransformOpInterface>]> {
+
+//def LoopInterchangeOp : Op<Transform_Dialect, "loop.interchange",
+ //   [FunctionalStyleTransformOpTrait, MemoryEffectsOpInterface,
+   // TransformOpInterface]> {
+  
+  let summary = "This operation does loop interchange on scf dialect at very naive level.";
+  let description = [{
+    # Code without applying interchange.
+    ```
+    scf.for %i = 0 to %n step %1{
+      scf.for %j = 0 to %m step %1 {
+
+      }
+    }
+    ```
+    `Applying transform.interchange %outer %inner`
+
+    # Code after applying interchange.
+    ```
+    scf.for %j = 0 to %m step %1{
+      scf.for %i = 0 to %n step %1 {
+
+      }
+    }
+    ```
+
+    The code is naive version.
+    1. No dependence checks.
+    2. Simple rectangular loops.
+    3. Loops should be nested perfectly.
+    4. %inner and %outer should be from the same loop nest and can't be from 2 different loop nests.
+    5. As of now only on 2 loop levels, not thinking from `n` loop nest perspective.
+
+  }];
+
+  let arguments = (ins 
+                  Transform_ScfForOp:$loop_one_handle,  // 1st loop
+                  Transform_ScfForOp:$loop_two_handle  // 2nd loop
+                  // No attributes for this Op.
+                  );
+
+  let assemblyFormat = "$loop_one_handle $loop_two_handle attr-dict `:` type($loop_one_handle) `,` type($loop_two_handle)";                  
+/*
+  let extraClassDeclaration = [{
+    ::mlir::DiagnosedSilenceableFailure applyOnTwoLoops(
+        ::mlir::scf::ForOp loop_one_handle,
+        ::mlir::scf::ForOp loop_two_handle,
+        ::llvm::SmallVector<::mlir::Operation *> &results,
+        ::mlir::transform::TransformState &state);
+  }];*/
+}*/
 #endif // SCF_TRANSFORM_OPS
