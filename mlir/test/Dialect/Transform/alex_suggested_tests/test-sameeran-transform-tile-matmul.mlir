@@ -23,7 +23,7 @@ module {
     // outermost = 0
     // middle = 1
     // innermost = 2
-    %tiled_linalg_op, %loops:3 = transform.structured.tile %0 [2,3,4] {static_size="", interchange=[1,2,0]}
+    %tiled_linalg_op, %loops:3 = transform.structured.tile %0 [2,3,4] // {static_size="", interchange=[1,2,0]}
   }
   func.func private @printMemrefi64(tensor<*xi64>)
 }

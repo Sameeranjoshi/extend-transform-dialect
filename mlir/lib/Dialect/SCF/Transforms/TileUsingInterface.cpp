@@ -336,6 +336,19 @@ mlir::scf::tileUsingSCFForOp(RewriterBase &rewriter, TilingInterface op,
     // nothing more to do.
     return tilingResult;
   }
+/*
+  // THIS WORKS HERE BECAUSE - THE TOP FUNCTION ONLY COMPUTE THE BOUNDS AND SUCH AND NOT BODY WHICH IS TILED, AND EXTRACTS THE SLICES.
+  // AFTER ABOVE POINT 4 IT WORKS.
+      int i=0;
+      mlir::scf::ForOp &innermost = tilingResult.loops.back();
+      mlir::scf::ForOp &outermost = tilingResult.loops.front();
+      if (innermost && outermost){
+        llvm::outs () << "\n LOOP innermost" << ++i << "\n";
+        innermost.dump();
+        llvm::outs () << "\n LOOP outermost" << ++i << "\n";
+        outermost.dump();
+      }
+*/
 
   // If loops are empty, the tiled op is used as the replacement for the untiled
   // op.

@@ -1316,9 +1316,11 @@ void transform::TileOp::build(OpBuilder &builder, OperationState &result,
 DiagnosedSilenceableFailure
 transform::TileOp::apply(TransformResults &transformResults,
                          TransformState &state) {
+  // tileSizes = static
   ArrayRef<int64_t> tileSizes = getStaticSizes();
 
   ArrayRef<Operation *> targets = state.getPayloadOps(getTarget());
+  // dynamicSizeProducers = dynamic size
   SmallVector<ArrayRef<Operation *>> dynamicSizeProducers;
   dynamicSizeProducers.reserve(getDynamicSizes().size());
   for (Value dynamicSizeProducerHandle : getDynamicSizes()) {
@@ -1362,6 +1364,7 @@ transform::TileOp::apply(TransformResults &transformResults,
 
     scf::SCFTilingOptions tilingOptions;
     unsigned index = en.index();
+    // This means there is static sizes
     if (!tileSizes.empty()) {
       tilingOptions.setTileSizeComputationFunction(
           [&, index](OpBuilder &b, Operation *) {
@@ -1383,6 +1386,11 @@ transform::TileOp::apply(TransformResults &transformResults,
 
     tilingOptions.setInterchange(getInterchange());
     TrivialPatternRewriter rewriter(linalgOp.getContext());
+    // We set the tilingoptions before and now we pass it as a parameter, even
+    // we pass rewriter to it, so it rewrites.
+    // linalgOp - is nothing but linalg.matmul line in payload Op.
+    // input - linalgOp, tilingoptions, rewriter.
+    // output - tiledOp.
     FailureOr<scf::SCFTilingResult> maybeTilingResult = tileUsingSCFForOp(
         rewriter, cast<TilingInterface>(linalgOp.getOperation()),
         tilingOptions);
@@ -1399,6 +1407,20 @@ transform::TileOp::apply(TransformResults &transformResults,
     for (const auto &en2 : llvm::enumerate(maybeTilingResult->loops))
       loops[en2.index()].push_back(en2.value());
   }
+
+/*   // DEBUG CODE.
+  for (const auto &tile : llvm::enumerate(tiled))
+  {
+      std::cout << "\n Index " << tile.index();
+      tile.value()->dump();
+  }
+  std::cout << "\n LOOPS\n";
+  for (const auto &loop : llvm::enumerate(loops))
+  {
+      for (const auto &l : llvm::enumerate(loop.value())){
+       l.value()->print(llvm::outs());
+      }
+  } */
 
   transformResults.set(getTiledLinalgOp().cast<OpResult>(), tiled);
   for (const auto &en : llvm::enumerate(loops))
