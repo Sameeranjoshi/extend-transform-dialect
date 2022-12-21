@@ -124,6 +124,7 @@ void registerTestTransformDialectInterpreterPass();
 void registerTestWrittenToPass();
 void registerTestVectorLowerings();
 void registerTestNvgpuLowerings();
+void registerDummyTestPass();
 } // namespace test
 } // namespace mlir
 
@@ -231,6 +232,7 @@ void registerTestPasses() {
   mlir::test::registerTestVectorLowerings();
   mlir::test::registerTestNvgpuLowerings();
   mlir::test::registerTestWrittenToPass();
+  mlir::test::registerDummyTestPass();
 }
 #endif
 

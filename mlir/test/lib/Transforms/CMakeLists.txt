@@ -16,6 +16,7 @@ add_mlir_library(MLIRTestTransforms
   TestInlining.cpp
   TestIntRangeInference.cpp
   TestTopologicalSort.cpp
+  TestDummy.cpp
 
   EXCLUDE_FROM_LIBMLIR
 
