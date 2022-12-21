@@ -39,6 +39,7 @@ class GreedyRewriteConfig;
 #define GEN_PASS_DECL_SYMBOLDCE
 #define GEN_PASS_DECL_SYMBOLPRIVATIZE
 #define GEN_PASS_DECL_TOPOLOGICALSORT
+#define GEN_PASS_DECL_DUMMYODS
 #include "mlir/Transforms/Passes.h.inc"
 
 /// Creates an instance of the Canonicalizer pass, configured with default
@@ -113,6 +114,9 @@ createSymbolPrivatizePass(ArrayRef<std::string> excludeSymbols = {});
 /// topologically such that, as much as possible, users of values appear after
 /// their producers.
 std::unique_ptr<Pass> createTopologicalSortPass();
+
+// This pass is now being registered internally implicitly.
+std::unique_ptr<Pass> createDummyODSPass();
 
 //===----------------------------------------------------------------------===//
 // Registration

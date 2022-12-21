@@ -281,4 +281,21 @@ def TopologicalSort : Pass<"topological-sort"> {
   let constructor = "mlir::createTopologicalSortPass()";
 }
 
+// This has various variables, check the class/online webpage.
+def DummyODS : Pass<"dummy-ods-pass"> {
+  let summary = "Does nothing just a pass using ODS";
+  let description = [{
+    Nothing useful, it's just a framework commit as of now.
+  }];
+  let options = [
+    Option<"Simple","simple","std::string","","This is the first option, does nothing">,
+    Option<"Medium","medium","std::string","","This is the second option, does nothing">,
+    Option<"Difficult","difficult","std::string","","This is the third option, does nothing">,
+    ListOption<"Verydifficult", "verydifficult", "std::string", "This is the forth option, does nothing">
+  ];
+  let statistics = [
+    Statistic<"captureStats", "count-stats", "This tries to capture the count of the operation, but seriously IDK where are we specifying it.">
+  ];
+  let constructor = "mlir::createDummyODSPass()";
+}
 #endif // MLIR_TRANSFORMS_PASSES
